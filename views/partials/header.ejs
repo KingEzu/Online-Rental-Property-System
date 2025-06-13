@@ -1,0 +1,37 @@
+<nav class="nav-bar">
+    <h1>OPRS Admin</h1> 
+    <ul class="nav-options">
+        <li><a href="/admin/metrics">Metrics</a></li>
+        <li><a href="/admin/users">Users</a></li>
+        <li><a href="/admin/listings">Listings</a></li>
+        <li><a href="/admin/log">Log</a></li>
+        <li><a href="/admin/dashboard">Reports</a></li>
+        <button onclick="signout()" style="color: red; cursor: pointer; border: solid 0.2rem red; border-radius: 0.5rem; padding: 1rem 2rem; background: white; font-weight: bold;">SignOut</button>
+    </ul>
+</nav>
+<script>
+    const signout = () => {
+        const sure = confirm('Are you sure');
+            if (sure) {
+                fetch(
+                    '/account/signout', { 
+                    headers : {
+                        "Content-Type": 'application/json'
+                    },
+                    method : 'GET'
+                }).then(res => {
+                    return res.json();
+                }).then(data =>{
+                    if (data.success) {
+                        location.href = "/admin/";
+                    }else{
+                        alert(data.message);
+                    }
+                })
+                .catch(err => {
+                    alert(err);   
+                    console.error(err)
+                });
+                }
+            }
+</script>

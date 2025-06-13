@@ -1,0 +1,237 @@
+<div class="userForm">
+    <h1 class="title">Users</h1>
+</div>
+<div class="user-container"></div>
+<script>
+    let currentPage = 1;
+    document.addEventListener('DOMContentLoaded', () => {
+        loadUsers(currentPage);
+    });
+
+    const deleteUser = async (id) => {
+        if (!confirm("Delete user?")) {
+            return;
+        }
+        fetch(
+            `/user/remove/${id}`,{
+            headers : {
+            "Content-Type": 'application/json'
+            },
+            method : 'DELETE'
+            }
+        )
+        .then((res) => res.json())
+        .then((data) => {
+            alert("User deleted Successfully!")
+        })
+        .catch((error) => {
+            alert("Failed to delete a user!")
+            console.log(error);
+        });
+    }
+
+
+    const activateUser = async (id) => {
+        if (!confirm("Activate user?")) {
+            return;
+        }
+        fetch(
+            `/user/activate/${id}`,{
+            headers : {
+            "Content-Type": 'application/json'
+            },
+            method : 'PUT'
+            }
+        )
+        .then((res) => res.json())
+        .then((data) => {
+            alert("User activated Successfully!")
+        })
+        .catch((error) => {
+            alert("Failed to activate a user!")
+            console.log(error);
+        });
+    }
+
+
+    const suspendUser = async (id) => {
+        if (!confirm("Suspend user?")) {
+            return;
+        }
+        fetch(
+            `/user/suspend/${id}`,{
+            headers : {
+            "Content-Type": 'application/json'
+            },
+            method : 'PUT'
+            }
+        )
+        .then((res) => res.json())
+        .then((data) => {
+            alert("User suspended Successfully!")
+        })
+        .catch((error) => {
+            alert("Failed to modify a user!")
+            console.log(error);
+        });
+    }
+
+    const loadUsers = async (page) =>{
+        const userContainer = document.querySelector('.user-container');
+        fetch(
+            `/user/page/${page}`,{
+            headers : {
+            "Content-Type": 'application/json'
+            },
+            method : 'GET'
+            }
+        )
+        .then((res) => res.json())
+        .then((data) => {
+        Array.from(data.body).map((e,i) => {
+            const userCardHTML = `
+                <div class="user-card">
+                    <div class="user-card-header">
+                        <img src="${e.photo_url}" alt="User Photo" class="user-photo">
+                        <div class="user-info">
+                            <h2 class="user-name">${e.full_name}</h2>
+                            <p class="user-role">${e.job_type}</p>
+                        </div>
+                    </div>
+                    <div class="user-card-body">
+                        <p><strong>Email:</strong> ${e.email}</p>
+                        <p><strong>Phone Number:</strong> ${e.phone_number}</p>
+                        <p><strong>Gender:</strong> ${e.gender}</p>
+                        <p><strong>Region:</strong> ${e.region}</p>
+                        <p><strong>Zone:</strong> ${e.zone}</p>
+                        <p><strong>Woreda:</strong> ${e.woreda}</p>
+                        <p><strong>Date Joined:</strong> ${new Date(e.date_joined).toLocaleDateString()}</p>
+                        <p><strong>Account Status:</strong> ${e.account_status}</p>
+                        <p><strong>Married:</strong> ${e.married ? 'Yes' : 'No'}</p>
+                    </div>
+                    <div class="user-card-footer">
+                        ${e.account_status >= 3000 ? "" : `<button onClick="activateUser(${e.user_id})" class="btn activate-btn">Activate</button>`}
+                        ${e.account_status <= 1000 ? "" : `<button onClick="suspendUser(${e.user_id})" class="btn suspend-btn">Suspend</button>`}
+                        <button onClick="deleteUser(${e.user_id})" class="btn delete-btn">Delete</button>
+                    </div>
+                </div>
+            `;
+            userContainer.innerHTML += userCardHTML;
+          });
+        })
+        .catch((error) => {
+            alert("Failed to fetch logs!")
+            console.log(error);
+        });
+    }
+    
+    const nextPage = () => {
+        currentPage++;
+    }
+
+    const prevPage = () => {
+        currentPage--;
+    }
+</script>
+
+<style>
+
+    .user-container{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 2rem;
+        align-items: center;
+        justify-content: center;
+        margin: 5rem auto;
+    }
+
+    .user-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        max-width: 400px;
+        width: 100%;
+    }
+
+    .user-card-header {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .user-photo {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 16px;
+    }
+
+    .user-info h2 {
+        margin: 0;
+        font-size: 24px;
+    }
+
+    .user-info p {
+        margin: 4px 0;
+        font-size: 14px;
+    }
+
+    .user-card-body {
+        padding: 16px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .user-card-body p {
+        margin: 8px 0;
+    }
+
+    .user-card-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 16px;
+        background-color: #f1f1f1;
+    }
+
+    .btn {
+        border: none;
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .suspend-btn {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .suspend-btn:hover {
+        background-color: #e0a800;
+    }
+
+    .activate-btn {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .activate-btn:hover {
+        background-color: #218838;
+    }
+
+    .delete-btn {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+    .delete-btn:hover {
+        background-color: #c82333;
+    }
+</style>
+

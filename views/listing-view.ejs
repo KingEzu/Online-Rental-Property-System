@@ -1,0 +1,252 @@
+<div class="userForm">
+    <h1 class="title">Listings</h1>
+</div>
+<div class="user-container"></div>
+<script>
+    let currentPage = 1;
+    document.addEventListener('DOMContentLoaded', () => loadListing(currentPage));
+    const deleteListing = async (id) => {
+        if (!confirm("Delete Listing?")) {
+            return;
+        }
+        fetch(
+            `/listing/remove/${id}`,{
+            headers : {
+            "Content-Type": 'application/json'
+            },
+            method : 'DELETE'
+            }
+        )
+        .then((res) => res.json())
+        .then((data) => {
+            alert("Listing deleted Successfully!")
+        })
+        .catch((error) => {
+            alert("Failed to delete a listing!")
+            console.log(error);
+        });
+    }
+
+    const loadListing = async (page) =>{
+        const userContainer = document.querySelector('.user-container');
+        fetch(
+            `/listing/page/${page}`,{
+            headers : {
+            "Content-Type": 'application/json'
+            },
+            method : 'GET'
+            }
+        )
+        .then((res) => res.json())
+        .then((data) => {
+        Array.from(data.body).map((listing,i) => {
+            const userCardHTML = `
+                <div class="user-card">
+                    <div class="user-card-header">
+                        <div class="listing-image-container">
+                            ${Array.from(listing.photo_urls ?? []).map((url) => `<img class="listing-photo" src="${url}" alt="listing photo" srcset="">`)}
+                        </div>
+                        <div class="user-info">
+                            <h2 class="user-name">${listing.title}</h2>
+                            <p class="user-role">${listing.description}</p>
+                        </div>
+                    </div>
+                    <div class="user-card-body">
+                   <div>
+                    <b><p>  Listing id</p></b> :
+                   <b><p>${listing.listing_id}</p></b>
+                    </div>
+                   <div>
+                    <p>  Owner id   </p> :
+                   <p>${listing.owner_id}</p>
+                    </div>
+                   <div>
+                    <p>  Owner   </p> :
+                   <p>${listing.owner}</p>
+                    </div>
+                   <div>
+                    <p>  Type   </p> :
+                   <p>${listing.type}</p>
+                    </div>
+                   <div>
+                    <p>  Sub_city   </p> :
+                   <p>${listing.sub_city}</p>
+                    </div>
+                   <div>
+                    <p>  Woreda   </p> :
+                   <p>${listing.woreda}</p>
+                    </div>
+                   <div>
+                    <p>  Area name   </p> :
+                   <p>${listing.area_name}</p>
+                    </div>
+                   <div>
+                    <p>  Price per duration   </p> :
+                   <p>${listing.price_per_duration}</p>
+                    </div>
+                   <div>
+                    <p>  Payment currency   </p> :
+                   <p>${listing.payment_currency}</p>
+                    </div>
+                   <div>
+                    <p>  Total area square_meter   </p> :
+                   <p>${listing.total_area_square_meter}</p>
+                    </div>
+                   <div>
+                    <p>  Listing status   </p> :
+                   <p>${listing.listing_status == 1000 ? "Not Available" : "Available"}</p>
+                    </div>
+                   <div>
+                    <p>  Views   </p> :
+                   <p>${listing.views}</p> 
+                    </div>
+                   <div>
+                    <p>  Parking capacity   </p> :
+                   <p>${listing.parking_capacity}</p>
+                    </div>
+                   <div>
+                    <p>  Number of floors   </p> :
+                   <p>${listing.number_of_floors}</p>
+                    </div>
+                   <div>
+                    <p>Created At</p> :
+                   <p>${new Date(listing.created_at).toLocaleString()}</p>
+                    </div>
+                   <div>
+                    <p>Updated At</p> :
+                   <p>${new Date(listing.updated_at).toLocaleString()}</p>
+                    </div>
+                    </div>
+                    <div class="user-card-footer">
+                        <button onClick="deleteListing(${listing.listing_id})" class="btn delete-btn">Delete Listing</button>
+                    </div>
+                </div>
+                `;
+            userContainer.innerHTML += userCardHTML;
+          });
+        })
+        .catch((error) => {
+            alert("Failed to fetch listings!")
+            console.log(error);
+        });
+    }
+    
+    const nextPage = () => {
+        currentPage++;
+    }
+
+    const prevPage = () => {
+        currentPage--;
+    }
+</script>
+
+<style>
+
+    p{
+        display: inline-block;
+    }
+
+    .user-container{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 2rem;
+        align-items: center;
+        justify-content: center;
+        margin: 5rem auto;
+    }
+
+    .user-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        max-width: 400px;
+        width: 100%;
+    }
+
+    .user-card-header {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .listing-photo {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        margin-right: 16px;
+    }
+
+    .listing-image-container{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .user-info h2 {
+        margin: 0;
+        font-size: 24px;
+    }
+
+    .user-info p {
+        margin: 4px 0;
+        font-size: 14px;
+    }
+
+    .user-card-body {
+        padding: 16px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .user-card-body p {
+        margin: 8px 0;
+    }
+
+    .user-card-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 16px;
+        background-color: #f1f1f1;
+    }
+
+    .btn {
+        border: none;
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .suspend-btn {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .suspend-btn:hover {
+        background-color: #e0a800;
+    }
+
+    .activate-btn {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .activate-btn:hover {
+        background-color: #218838;
+    }
+
+    .delete-btn {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+    .delete-btn:hover {
+        background-color: #c82333;
+    }
+</style>

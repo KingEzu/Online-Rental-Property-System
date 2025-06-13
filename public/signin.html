@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css">
+    <title>OPRS Admin Sign In</title>
+</head>
+<body>
+    <div class="nav-bar">
+        <h1>Sign In</h1>
+        <ul><li><a href="/admin/">Home</a></li></ul>
+    </div>
+    <div class="container"> 
+        <div class="inputForm" id="userLoginForm">
+            <h1 class="title" id="titleLogin">LOGIN</h1>
+            <form class="form" action="/auth/signin" method="post">
+                <input type="email" name="email" class="userInput" placeholder="Email" required>
+                <p class="return-message"></p>
+                <input type="password" name="password" class="userInput" placeholder="Password" required>
+                <p class="return-message"></p>
+                <div class="btn-holder">
+                    <Button class="inputBtn" id="signinButton" type="submit">Sign In</Button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <style>
+        :root{
+            font-size: 62.7%;
+        }
+
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body{
+            font-size: 1.6rem;
+            background: #FFFFFF;
+            color: #777777;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .title{
+            display: block;
+            text-align: center;
+            padding: 0.2rem;
+            color: #6666FF;
+        }
+
+
+        .nav-bar h1{
+            color: #6666FF;
+        }
+
+        .nav-bar{
+            height: 8rem;
+            display: flex;
+            justify-content: space-between;
+            padding: 5rem 5rem;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            border: rgba(0, 0, 0, 0.2) solid 0.2rem;   
+            background: #FFFFFF;
+        }
+
+        .nav-bar ul{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 5rem;
+            list-style: none;
+        }
+
+        .nav-bar ul li a{
+            text-decoration: none;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .nav-bar ul li a:hover{
+            color: #ff3b3b;
+        }
+
+        .welcome-container{
+            max-width: 600px;
+            margin: 5rem auto;
+            text-align: center;
+            padding: 2rem;
+            border: rgba(0, 0, 0, 0.2) solid 0.2rem;
+            background: #FFFFFF;
+        }
+
+        .welcome-container p{
+            margin: 2rem 0;
+            font-size: 1.4rem;
+            color: #555555;
+        }
+
+        .dashboard-link{
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background-color: #6666FF;
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 1.6rem;
+            font-weight: bold;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .dashboard-link:hover{
+            background-color: #9999ff;
+        }
+
+        .userForm{
+            padding: 1rem 4rem;
+            background: #FFFFFF;
+            width: 70%;
+            margin: 2rem auto;
+            border: rgba(0, 0, 0, 0.2) solid 0.2rem;
+        }
+
+        .inputForm{
+            padding: 1rem 4rem;
+            background: #FFFFFF;
+            width: 50%;
+            margin: 2rem auto;
+            border: rgba(0, 0, 0, 0.2) solid 0.2rem;
+        }
+
+        .userInput{
+            display: block;
+            padding: 2rem;
+            width: 100%;
+            margin: 2rem auto;
+            outline: none;
+            border: none;
+            font-size: 1.7rem;
+            border: rgba(0, 0, 0, 0.2) solid 0.2rem;
+        }
+
+        .btn-holder{
+            display: flex;
+            gap: 1rem;
+        }
+
+        .inputBtn{
+            padding: 3rem;
+            width: 100%;
+            font-weight: bold;
+            border: none;
+            color: #FFF;
+            font-size: 1.7rem;
+            background: #6666FF;
+            cursor: pointer;
+        }
+
+        .inputBtn:hover{
+            background: #9999ff;
+            transition: 0.3s ease-in-out;
+        }
+
+        form div {
+            display: flex;
+            flex-direction: row;
+            margin: 5rem 0.3rem;
+        }
+
+        .return-message{
+            margin: auto;
+            font-size: 1.4rem;
+            background: #ffffff;
+            margin: 0.5rem 0rem;
+            color: #ff3b3b;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .visible{
+            display: block;
+        }
+
+        #registration-status{
+            padding: 3rem;
+            width: 60%;
+            margin: auto;
+            border: rgba(0, 0, 0, 0.2) solid 0.2rem;   
+            color: #ff3b3b;
+            font-weight: bold;
+            font-size: 1.8rem;
+            display: none;
+        }  
+
+        .log-viewer {
+            width: 70%;
+            margin: 30px auto;
+            height: 70vh; 
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #0000001a;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .log-viewer-header {
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #ccc;
+            text-align: right;
+        }
+
+        #clear-button {
+            padding: 5px 10px;
+            border: none;
+            background-color: #d9534f;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+
+        #clear-button:hover {
+            background-color: #c9302c;
+        }
+
+        .log-viewer-content {
+            padding: 10px;
+            flex-grow: 1; /* Fill remaining space */
+            overflow: auto; /* Enable both horizontal and vertical scrolling */
+            white-space: nowrap; /* Prevent wrapping */
+        }
+
+        .log-entry {
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            white-space: pre; /* Preserve whitespace */
+        }
+    </style>
+    <script src="/login.js"></script>
+</body>
+</html>

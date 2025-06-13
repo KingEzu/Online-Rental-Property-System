@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Listings</title>
+    <link rel="stylesheet" href="/dashboard.css">
+    <script src="/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h4>Select Category</h4>
+        <select name="reportType" id="report-type-input">
+            <option value="listing">Listings</option>
+            <option value="user">Users</option>
+            <option value="reservation">Reservations</option>
+            <option value="payment">Payment References</option>
+        </select>
+        <button id="export-button">Export to Excel</button>
+        <div id="listings-container"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const listingsContainer = document.getElementById('listings-container');
+            const exportButton = document.getElementById('export-button');
+            const changeReportType = document.getElementById('report-type-input');
+            let reportType = "listing";
+
+            changeReportType.addEventListener('change', function () {
+                const type = changeReportType.value;
+                if (type === "listing") {
+                    fetchListings();
+                } else if(type === "user"){
+                    fetchUsers();
+                } else if(type === "reservation"){
+                    fetchReservations();
+                } else if(type === "payment"){
+                    fetchPaymentReferences();
+                }
+            });
+
+            function exportTableToExcel(filename) {
+                const table = document.querySelector("table");
+                const workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+                XLSX.writeFile(workbook, filename);
+            }
+
+            exportButton.addEventListener('click', () => exportTableToExcel(`${changeReportType.value}_report.xlsx`));
+            fetchListings();
+        });
+
+
+        function fetchUsers() {
+            fetch(`reportUser`,{
+                headers : {"Content-Type": 'application/json'},
+                method : 'GET'
+            })
+            .then((res) => res.json())
+            .then(
+                (data) => {
+                Array.from(data).map((e,i) => {
+                let table = '<table border="1">';
+                table += `
+                <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>User role</th>
+                    <th>Job Type</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Gender</th>
+                    <th>Region</th>
+                    <th>Zone</th>
+                    <th>Woreda</th>
+                    <th>Date Joined</th>
+                    <th>Account Status</th>
+                    <th>Married</th>
+                </tr>`;
+                data.length < 1 ? table += `<tr><td colspan="13">No Data</td></tr>` :
+                data.forEach(user => {
+                    table += `<tr>
+                        <td>${user.user_id}</td>
+                        <td>${user.full_name}</td>
+                        <td>${user.user_role == 1000 ? "Tenant" : user.user_role == 2000 ? "Owner" : "Admin"}</td>
+                        <td>${user.job_type}</td>
+                        <td>${user.email}</td>
+                        <td>${user.phone_number}</td>
+                        <td>${user.gender}</td>
+                        <td>${user.region}</td>
+                        <td>${user.zone}</td>
+                        <td>${user.woreda}</td>
+                        <td>${new Date(user.date_joined).toLocaleString()}</td>
+                        <td>${user.account_status == 1000 ? "Suspended" : user.user_role == 2000 ? "Not Verified" : "Verified"}</td>
+                        <td>${user.married ? "Yes" : "No"}</td>
+                    </tr>`;
+                });
+
+                table += '</table>';
+                document.getElementById('listings-container').innerHTML = table;
+            });
+        })
+        .catch((error) => {
+            alert("Failed to fetch Users!")
+            console.log(error);
+        });
+    }
+
+    function fetchListings() {
+        fetch('reportListing', {
+            headers: {"Content-Type": 'application/json'},
+            method: 'GET'})
+            .then((res) => res.json())
+            .then((data) => {
+                let table = '<table border="1">';
+                table += `
+                <tr>
+                    <th>ID</th>
+                    <th>Owner ID</th>
+                    <th>Owner</th>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Sub City</th>
+                    <th>Woreda</th>
+                    <th>Area Name</th>
+                    <th>Price</th>
+                    <th>Currency</th>
+                    <th>Total Area (m²)</th>
+                    <th>Status</th>
+                    <th>Views</th>
+                    <th>Parking Capacity</th>
+                    <th>Number of Floors</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
+                </tr>`;
+                data.length < 1 ? table += `<tr><td colspan="39">No Data</td></tr>` :
+                data.forEach(listing => {
+                    table += `<tr>
+                    <td>${listing.listing_id}</td>
+                    <td>${listing.owner_id}</td>
+                    <td>${listing.owner}</td>
+                    <td>${listing.type}</td>
+                    <td>${listing.title}</td>
+                    <td>${listing.description}</td>
+                    <td>${listing.sub_city}</td>
+                    <td>${listing.woreda}</td>
+                    <td>${listing.area_name}</td>
+                    <td>${listing.price_per_duration}</td>
+                    <td>${listing.payment_currency}</td>
+                    <td>${listing.total_area_square_meter}</td>
+                    <td>${listing.listing_status == 1000 ? "Not Available" : "Available"}</td>
+                    <td>${listing.views}</td>
+                    <td>${listing.parking_capacity}</td>
+                    <td>${listing.number_of_floors}</td>
+                    <td>${new Date(listing.created_at).toLocaleString()}</td>
+                    <td>${new Date(listing.updated_at).toLocaleString()}</td>
+                </tr>`;
+            });
+            table += '</table>';
+            document.getElementById('listings-container').innerHTML = table;
+        })
+        .catch((error) => {
+            console.log(error);
+            alert("Failed to fetch listings!");
+        });
+    }
+
+    function fetchReservations() {
+            fetch('/reservation/reservationReport', {
+                headers: {"Content-Type": 'application/json'},
+                method: 'GET'
+            })
+            .then((res) => {
+                return res.json();
+            })
+            .then((data) => {
+                let table = '<table border="1">';
+                table += `
+                <tr>
+                    <th>Reservation ID</th>
+                    <th>Owner ID</th>
+                    <th>Tenant Full Name</th>
+                    <th>Tenant Phone Number</th>
+                    <th>Listing Title</th>
+                    <th>Description</th>
+                    <th>Lease Duration (days)</th>
+                    <th>Price Offer</th>
+                    <th>Selected Payment Method</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
+                </tr>`;
+                if (data.length < 1) {
+                    table += `<tr><td colspan="12">No Data</td></tr>`;
+                } else {
+                    data.forEach(reservation => {
+                        table += `
+                        <tr>
+                            <td>${reservation.reservation_id}</td>
+                            <td>${reservation.owner_id}</td>
+                            <td>${reservation.tenant.full_name}</td>
+                            <td>${reservation.tenant.phone_number}</td>
+                            <td>${reservation.listing_title}</td>
+                            <td>${reservation.description}</td>
+                            <td>${reservation.lease_duration_days}</td>
+                            <td>${reservation.price_offer}</td>
+                            <td>${reservation.selected_payment_method}</td>
+                            <td>${reservation.status}</td>
+                            <td>${new Date(reservation.created_at).toLocaleString()}</td>
+                            <td>${new Date(reservation.updated_at).toLocaleString()}</td>
+                        </tr>`;
+                    });
+                }
+                table += '</table>';
+                document.getElementById('listings-container').innerHTML = table;
+            })
+            .catch((error) => {
+                console.log(error);
+                alert("Failed to fetch reservations!")
+            });
+        }
+
+        function fetchPaymentReferences() {
+            fetch('/payment/getAllReferences', {
+                headers: {"Content-Type": 'application/json'},
+                method: 'GET'
+            })
+            .then((res) => {
+                console.log(res);
+                return res.json()
+            })
+            .then((data) => {
+                let table = '<table border="1">';
+                table += `
+                <tr>
+                    <th>Id</th>
+                    <th>Tenant ID</th>
+                    <th>owner ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Currency</th>
+                    <th>Amount</th>
+                    <th>Charge</th>
+                    <th>Mode</th>
+                    <th>Method</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Transaction ref</th>
+                    <th>reference</th>
+                    <th>title</th>
+                    <th>Description</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
+                </tr>`;
+
+                if (data.length < 1) {
+                    table += `<tr><td colspan="19">No Data</td></tr>`;
+                } else {
+                    data.forEach(payment => {
+                        table += `
+                        <tr>
+                            <td>${payment.id}</td>
+                            <td>${payment.tenant_id}</td>
+                            <td>${payment.owner_id}</td>
+                            <td>${payment.first_name}</td>
+                            <td>${payment.last_name}</td>
+                            <td>${payment.email}</td>
+                            <td>${payment.currency}</td>
+                            <td>${payment.amount}</td>
+                            <td>${payment.charge}</td>
+                            <td>${payment.mode}</td>
+                            <td>${payment.method}</td>
+                            <td>${payment.type}</td>
+                            <td>${payment.status}</td>
+                            <td>${payment.tx_ref}</td>
+                            <td>${payment.reference}</td>
+                            <td>${payment.title}</td>
+                            <td>${payment.description}</td>
+                            <td>${payment.created_at}</td>
+                            <td>${payment.updated_at}</td>
+                        </tr>`;
+                    });
+                }
+                table += '</table>';
+                document.getElementById('listings-container').innerHTML = table;
+            })
+            .catch((error) => {
+                console.log(error);
+                alert("Failed to fetch payment references!")
+            });
+        }
+    </script>
+</body>
+</html>
